@@ -3,50 +3,67 @@ from django.shortcuts import render, get_object_or_404
 from .models import *
 from django.db.models import Q, Count
 from django.contrib.contenttypes.models import ContentType
-
+import datetime
 # Create your views here.
 
 def anime_series(request):
     anime_series = AnimeSerie.objects.all()
     return render(request, 'home.html', {'anime_series': anime_series})
 
-
 def anime_detail(request, title):
-    anime = AnimeSerie.objects.get(title=title)
+    anime = get_object_or_404(AnimeSerie, title=title)
     genres = anime.anime_genre_tags.values_list('name', flat=True)
-    simillar_anime = AnimeSerie.objects.filter(anime_genre_tags__in=genres).exclude(id=anime_series.id)
+    simillar_anime = AnimeSerie.objects.filter(anime_genre_tags__in=genres).exclude(id=anime.id)
+    chapters = AnimeChapter.objects.filter(anime_serie=anime)
 
-    return render(request, 'series_template.html', {'anime': anime, 'simillar_anime': simillar_anime})
+    return render(request, 'anime_detail.html', {'anime': anime, 'simillar_anime': simillar_anime,'chapters': chapters})
 
 def chapter_detail(request, title, chapter_number):
-    anime = AnimeSerie.objects.filter(title=title)
-    chapter = AnimeChapter.objects.filter(anime_serie=anime, chapter_number=chapter_number)
-
-    return render(request, 'series_template', {'anime': anime, 'chapter' : chapter})
+    anime = get_object_or_404(AnimeSerie, title=title)
+    chapter = get_object_or_404(AnimeChapter, anime_serie=anime, chapter_number=chapter_number)
+    videos = Video.objects.filter(anime_chapter=chapter)
+    return render(request, 'chapter_detail.html', {'anime': anime, 'anime_chapter' : chapter, 'videos':videos})
 
 def video_detail(request, title, chapter_number, service):
     anime = AnimeSerie.objects.filter(title=title)
-    chapter = AnimeChapter.objects.filter(anime_serie=anime, chapter_number=chapter_number)
+    chapter = get_object_or_404(AnimeChapter, anime_serie=anime, chapter_number=chapter_number)
     service = Video.objects.filter(anime_chapter=chapter, service=service)
+    print(chapter)
 
-    return render(request, 'series_template', {'anime': anime, 'chapter' : chapter })
+    return render(request, 'series_template', {'anime': anime, 'anime_chapter' : chapter })
 
 def search_for_anime(request):
     search = request.GET.get('search', '')
     genres = request.GET.get('genres', '').split(sep=',')
-    genres_exl = request.GET.get('genres_exl', 'a').split(sep=',')
+    genres_exl = request.GET.get('genres_exl', '').split(sep=',')
     char_types = request.GET.get('char_types', '').split(sep=',')
-    char_types_exl = request.GET.get('char_types_exl', 'a').split(sep=',')
-    status = request.GET.get('status', '').split(sep=',')
-    season = request.GET.get('season', '').split(sep=',')
-    date_min = request.GET.get('date_min', '')
-    date_max = request.GET.get('date_max', '')
+    char_types_exl = request.GET.get('char_types_exl', '').split(sep=',')
+    status = request.GET.get('status', '')
+    season = request.GET.get('season', '')
+    year_min, month_min, day_min = request.GET.get('date_min', '1000-01-01').split(sep='-')
+    year_max, month_max, day_max = request.GET.get('date_max', '9999-12-30').split(sep='-')
+    year_min, month_min, day_min, year_max, month_max, day_max = [int(x) for x in [year_min, month_min, day_min, year_max, month_max, day_max]]
+    anime_series = AnimeSerie.objects.all()
+    if search:
+        anime_series = anime_series.filter(title__icontains=search)
+    if genres != ['']:
+        anime_series = anime_series.filter(anime_genre_tags__name__in=genres).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(genres))
+    if char_types != ['']:
+        anime_series = AnimeSerie.objects.filter(character_type_tags__name__in=char_types).annotate(num_tags=Count('character_type_tags')).filter(num_tags__gte=len(char_types))
 
-    anime_series = AnimeSerie.objects \
-    .filter(anime_genre_tags__name__in=genres).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(genres)).distinct() \
-    .exclude(anime_genre_tags__name__in=genres_exl).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(genres_exl)).distinct() \
-    .filter(character_type_tags__name__in=char_types).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(char_types)).distinct() \
-    .exclude(character_type_tags__name__in=char_types_exl).annotate(num_tags=Count('anime_genre_tags')).exclude(num_tags__gte=len(char_types_exl)).distinct() \
+    anime_series = anime_series.exclude(anime_genre_tags__name__in=genres_exl).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(genres_exl)) \
+    .exclude(character_type_tags__name__in=char_types_exl).annotate(num_tags=Count('character_type_tags')).filter(num_tags__gte=len(char_types_exl))
 
+    if status:
+        anime_series = anime_series.filter(Q(status__exact=status))
+    if season:
+        anime_series = anime_series.filter(Q(season__exact=season))
+    
+    if year_min:
+        anime_series = anime_series.filter(released_at__gte=datetime.date(year_min, month_min, day_min))
+    if year_max:
+        anime_series = anime_series.filter(released_at__lte=datetime.date(year_max, month_max, day_max))
+
+    anime_series = anime_series.distinct()
 
     return render(request, 'home.html', {'anime_series': anime_series})

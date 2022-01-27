@@ -90,7 +90,7 @@ class AnimeSerie(models.Model):
 
     
     def get_absolute_url(self):
-        return reverse("streamer:anime-detail", kwargs={"title": self.title.lower()})
+        return reverse("streamer:anime-detail", kwargs={"title": self.title})
 
 
 class AnimeChapter(models.Model):
@@ -105,10 +105,10 @@ class AnimeChapter(models.Model):
     ]
 
     chapter_number = models.IntegerField(null=True)
-    previous_chapter = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_previous_chapter")
-    next_chapter = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_next_chapter")
+    previous_chapter = models.ForeignKey('self', blank=True,null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_previous_chapter")
+    next_chapter = models.ForeignKey('self', blank=True,null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_next_chapter")
     title = models.CharField(max_length=255)
-    description = models.TextField( blank=True, null=True, default="chwilowo brak.")
+    description = models.TextField( blank=True, null=True, default="currently n/a")
     anime_serie = models.ForeignKey(AnimeSerie, null=True, on_delete=models.CASCADE)
     type = models.CharField(max_length=31, null=True, choices=TYPES)
 
@@ -126,7 +126,7 @@ class AnimeChapter(models.Model):
         return str(self.anime_serie) + " " + str(self.chapter_number) + " " + str(self.title)
 
     def get_absolute_url(self):
-        return reverse("streamer:chapter-detail", kwargs={"title": self.anime_serie.title.lower(), "chapter_number": self.chapter_number})
+        return reverse("streamer:chapter-detail", kwargs={"title": self.anime_serie.title, "chapter_number": self.chapter_number})
 
     
 class Video(models.Model):

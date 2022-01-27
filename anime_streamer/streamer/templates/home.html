@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
 {% load streamer_tags %}
 {% include media %}
+
 {% block content %}
     <h1>currently we've added {% total_series %} series!</h1>
     <div>
+        <input type="text" id="searchField" placeholder="Search">
+        <button onclick="redirect()">search!</button>
+    </div>
+    <div>
         {% for anime in anime_series %}
-            <a href="{{ anime.title }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
+            <a href="{{ anime.get_absolute_url }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
         {% endfor %}
     </div>
+    <script>
+        function redirect(){
+            var url = "http://" + window.location.host + "{% url 'streamer:search-anime'  %}";
+            url += "?search=" + document.getElementById("searchField").value;
+            window.location.href = url;
+        }
+    </script>
     {% include "pagination.html" with page=anime_series %}
 {% endblock %}

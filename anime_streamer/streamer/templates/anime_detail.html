@@ -7,12 +7,17 @@
         <input type="submit" value="Submit">
     </form>
     <table>
+        <thead>
+            <td><b>title</b></td>
+            <td><b>type</b></td>
+            <td><b>created at</b></td>
+        </thead>
         <tbody>
             {% for chapter in chapters %}
                 <tr>
-                    <td><a href="./{{ chapter.chapter_number }}/">{{ series.title }} {{ chapter.chapter_number }}: {{ chapter.title }}</a></td>
+                    <td><a href="{{ chapter.get_absolute_url }}">{{ series.title }} {{ chapter.chapter_number }}: {{ chapter.title }}</a></td>
                     <td>{{ chapter.type }}</td>
-                    <td>{{ chapter.added_at|date:'d-m-Y' }}</td>
+                    <td>{{ chapter.created_at|date:'d-m-Y' }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -20,7 +25,7 @@
     <h2>Simillar animes</h2>
     <div>
         {% for anime in simillar_anime_series %}
-            <a href="{{ anime_series.get }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
+            <a href="{{ anime_series.get_absolute_url }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
         {% empty %}
             Nie ma podobnych postów.
         {% endfor %}
