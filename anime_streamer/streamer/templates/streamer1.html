@@ -1,0 +1,20 @@
+{% load socialaccount %}
+<html>
+
+<head>
+    <title>anime streamer</title>
+</head>
+
+<body>
+    {% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }} !</p>
+
+    {% else %}
+    <h1>My Google Login Project</h1>
+    <a href="{% provider_login_url 'google' %}">Login with Google</a>
+    {% endif %}
+    <iframe src="https://ebd.cda.pl/620x368/737886780" width="620" height="368" style="border:none;" frameBorder="0" scrolling="no" allowfullscreen name="v2">
+    </iframe>
+</body>
+
+</html>

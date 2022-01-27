@@ -23,7 +23,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -31,11 +31,12 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
+    'django.contrib.sessions',
+
     'gdstorage',
 
     'allauth',
@@ -81,7 +82,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = 1
+SITE_ID = 0
 LOGIN_REDIRECT_URL = '/'
 
 # Additional configuration settings
@@ -116,10 +117,14 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-    },
+        'ENGINE': config('DB_ENGINE'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT')
+    }
 }
-
 # config for google drive storage
 
 GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = os.path.join(BASE_DIR, 'google-drive-json.json')

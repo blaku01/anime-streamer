@@ -1,6 +1,6 @@
 from random import choices
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone, dateformat
 from django.urls import reverse
 
@@ -15,15 +15,15 @@ gd_storage = GoogleDriveStorage()
 class AnimeGenreTag(TagBase):
 
     class Meta:
-        verbose_name = _("Tag")
-        verbose_name_plural = _("Tags")
+        verbose_name = _("AnimeGenreTag")
+        verbose_name_plural = _("AnimeGenreTags")
 
 
-class CharacterTypeTag(TagBase):
+class ThemeTag(TagBase):
 
     class Meta:
-        verbose_name = _("Tag")
-        verbose_name_plural = _("Tags")
+        verbose_name = _("ThemeTag")
+        verbose_name_plural = _("ThemeTags")
 
 
 class TaggedAnimeGenre(GenericTaggedItemBase):
@@ -35,7 +35,7 @@ class TaggedAnimeGenre(GenericTaggedItemBase):
 
 class TaggedCharacterType(GenericTaggedItemBase):
     tag = models.ForeignKey(
-        CharacterTypeTag,
+        ThemeTag,
         on_delete=models.CASCADE,
         related_name="%(app_label)s_%(class)s_items",
     )
@@ -67,13 +67,13 @@ class AnimeSerie(models.Model):
 
 
     title = models.CharField(max_length=255, unique=True)
-    prequel = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_prequel")
-    sequel = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_sequel")
+    prequel = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_prequel")
+    sequel = models.ForeignKey('self', blank=True,null=True, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_sequel")
     status = models.CharField(max_length=31, null=True, choices=STATUSES)
     type = models.CharField(max_length=31, null=True, choices=TYPES)
 
     released_at = models.DateField(_("Date"), default=dateformat.format(timezone.now(), 'Y-m-d'))
-    season = models.CharField(max_length=31, null=True, choices=SEASONS)
+    season = models.CharField(max_length=31, blank=True, null=True, choices=SEASONS)
     created_at=models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     anime_genre_tags = TaggableManager(through=TaggedAnimeGenre)
@@ -90,7 +90,7 @@ class AnimeSerie(models.Model):
 
     
     def get_absolute_url(self):
-        return reverse("streamer:ViewSerie", kwargs={"title": self.title.lower()})
+        return reverse("streamer:anime-detail", kwargs={"title": self.title.lower()})
 
 
 class AnimeChapter(models.Model):
@@ -123,10 +123,10 @@ class AnimeChapter(models.Model):
         ordering = ['anime_serie', 'chapter_number']
 
     def __str__(self):
-        return str(self.anime_serie) + " " + str(self.chapter_number)
+        return str(self.anime_serie) + " " + str(self.chapter_number) + " " + str(self.title)
 
     def get_absolute_url(self):
-        return reverse("streamer:ViewChapter", kwargs={"title": self.anime_serie.title.lower(), "chapter_number": self.chapter_number})
+        return reverse("streamer:chapter-detail", kwargs={"title": self.anime_serie.title.lower(), "chapter_number": self.chapter_number})
 
     
 class Video(models.Model):
@@ -163,4 +163,4 @@ class Video(models.Model):
         ordering = ['created_at']
     
     def get_absolute_url(self):
-        return reverse("streamer:ViewVideo", kwargs={"title":self.anime_chapter.anime_serie.title, "chapter_number": self.anime_chapter.chapter_number, "service": self.service})
+        return reverse("streamer:watch-video", kwargs={"title":self.anime_chapter.anime_serie.title, "chapter_number": self.anime_chapter.chapter_number, "service": self.service})

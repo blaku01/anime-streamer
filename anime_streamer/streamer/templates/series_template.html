@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+    <p><a href="../">back to anime choice</a></p>
+    <form method="POST" action="">
+        {% csrf_token %}
+
+        <input type="submit" value="Submit">
+    </form>
+    <table>
+        <tbody>
+            {% for chapter in chapters %}
+                <tr>
+                    <td><a href="./{{ chapter.chapter_number }}/">{{ series.title }} {{ chapter.chapter_number }}: {{ chapter.title }}</a></td>
+                    <td>{{ chapter.type }}</td>
+                    <td>{{ chapter.added_at|date:'d-m-Y' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Simillar animes</h2>
+    <div>
+        {% for anime in simillar_anime_series %}
+            <a href="{{ anime_series.get }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
+        {% empty %}
+            Nie ma podobnych postów.
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block menu %}
+{% endblock %}

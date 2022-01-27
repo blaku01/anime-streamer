@@ -1,0 +1,34 @@
+A {
+    text-decoration: none;
+    color:#0079cc;
+}
+
+table {
+    border: 0.5px solid black;
+    border-collapse: separate;
+    border-spacing: 1px;
+    width: 50%;
+}
+td{
+    border: 1px solid #B9CDDA;
+    border-spacing: 1px;
+}
+body {
+    display:flex;
+    background-color: white;
+}
+#content {
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    height: 100%;
+    width:80%;
+}
+
+#sidebar {
+    width:20%;
+    height: 100%;
+    background-color: white;
+    border: 0.5px solid #B9CDDA;
+    border-radius: 10px;
+}

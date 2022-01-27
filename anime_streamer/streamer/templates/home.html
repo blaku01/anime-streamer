@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load streamer_tags %}
+{% include media %}
+{% block content %}
+    <h1>currently we've added {% total_series %} series!</h1>
+    <div>
+        {% for anime in anime_series %}
+            <a href="{{ anime.title }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
+        {% endfor %}
+    </div>
+    {% include "pagination.html" with page=anime_series %}
+{% endblock %}

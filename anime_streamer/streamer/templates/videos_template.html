@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+    <p><a href="../../">back to chapter choice</a> | <a href="../">back to server choice</a></p>
+    <h1>{{anime_series.title}}</h1>
+    <h2>{{anime_chapter.title}} chapter {{anime_chapter.chapter_number}}</h2>
+    <iframe src="{{video.video_link}}" width="620" height="368" style="border:none;" frameBorder="0" scrolling="no" allowfullscreen name="v2">
+    </iframe>{% endblock %}
+
+{% block menu %}
+{% endblock %}

@@ -1,0 +1,21 @@
+<html>
+
+<head>
+    <title>anime streamer</title>
+</head>
+
+<body>
+    <iframe src="https://ebd.cda.pl/620x368/737886780" width="620" height="368" style="border:none;" frameBorder="0" scrolling="no" allowfullscreen name="v2">
+    </iframe>
+    <p>{{ title.title }}</p>
+    <p>{{ title.prequel }}</p>
+    <p>{{ title.genres }}</p>
+    <p>{{ title.character_types }}</p>
+
+    {% for chapter in chapters %}
+    <p>{{ chapter }}</p>
+    {% endfor %}
+
+</body>
+
+</html>
