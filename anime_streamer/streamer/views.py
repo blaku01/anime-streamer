@@ -33,13 +33,17 @@ def video_detail(request, title, chapter_number, service):
     return render(request, 'series_template', {'anime': anime, 'anime_chapter' : chapter })
 
 def search_for_anime(request):
+    every_genre = AnimeGenreTag.objects.all()
+    every_char_type = ThemeTag.objects.all()
+    every_status = [x[1] for x in AnimeSerie.STATUSES]
+    every_season = [x[1] for x in AnimeSerie.SEASONS]
     search = request.GET.get('search', '')
     genres = request.GET.get('genres', '').split(sep=',')
     genres_exl = request.GET.get('genres_exl', '').split(sep=',')
     char_types = request.GET.get('char_types', '').split(sep=',')
     char_types_exl = request.GET.get('char_types_exl', '').split(sep=',')
-    status = request.GET.get('status', '')
-    season = request.GET.get('season', '')
+    status = request.GET.get('status', '').split(sep=',')
+    season = request.GET.get('season', '').split(sep=',')
     year_min, month_min, day_min = request.GET.get('date_min', '1000-01-01').split(sep='-')
     year_max, month_max, day_max = request.GET.get('date_max', '9999-12-30').split(sep='-')
     year_min, month_min, day_min, year_max, month_max, day_max = [int(x) for x in [year_min, month_min, day_min, year_max, month_max, day_max]]
@@ -54,10 +58,10 @@ def search_for_anime(request):
     anime_series = anime_series.exclude(anime_genre_tags__name__in=genres_exl).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(genres_exl)) \
     .exclude(character_type_tags__name__in=char_types_exl).annotate(num_tags=Count('character_type_tags')).filter(num_tags__gte=len(char_types_exl))
 
-    if status:
-        anime_series = anime_series.filter(Q(status__exact=status))
-    if season:
-        anime_series = anime_series.filter(Q(season__exact=season))
+    if status != [''] :
+        anime_series = anime_series.filter(status__in=status)
+    if season != ['']:
+        anime_series = anime_series.filter(season__in=season)
     
     if year_min:
         anime_series = anime_series.filter(released_at__gte=datetime.date(year_min, month_min, day_min))
@@ -66,4 +70,4 @@ def search_for_anime(request):
 
     anime_series = anime_series.distinct()
 
-    return render(request, 'home.html', {'anime_series': anime_series})
+    return render(request, 'home.html', {'anime_series': anime_series, 'every_genre': every_genre, 'every_char_type':every_char_type, 'every_status':every_status, 'every_season':every_season})

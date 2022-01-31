@@ -1,12 +1,46 @@
 {% extends 'base.html' %}
 {% load streamer_tags %}
 {% include media %}
+{% load static %}
 
 {% block content %}
+    <style>
+        search_form {
+            display: flex;
+            align-content: space-between;
+        }
+        input[type="button"] {
+                border: none;
+                outline:none;
+                }
+        input[type="button"]:hover {
+            box-shadow: 0 0 7px rgba(15, 8, 8, 0.5); 
+        }
+        a{
+            margin: 5px;
+        }
+
+    </style>
     <h1>currently we've added {% total_series %} series!</h1>
     <div>
-        <input type="text" id="searchField" placeholder="Search">
-        <button onclick="redirect()">search!</button>
+        <form action="{% url 'streamer:search-anime' %}" method="get" class="search_form">
+            <input name="search" type="text" id="searchField" placeholder="Search">
+            <p>anime genres:</p>
+            {% for genre in every_genre %}
+                <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="genre" name="genre_null" value="{{genre.name}}"></a>
+            {% endfor %}
+                <p>character types:</p>
+            {% for char_type in every_char_type %}
+                <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="char_type" name="char_type_null" value="{{char_type.name}}"style="border:none;"></a>
+            {% endfor %}
+            <p><input onclick="redirect()" type="button" value="search!"></p>
+            {% for status in every_status %}
+                <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="status" name="status_null" value="{{status}}"style="border:none;"></a>
+            {% endfor %}
+            {% for season in every_season %}
+            <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="season" name="season_null" value="{{season}}"style="border:none;"></a>
+            {% endfor %}
+        </form>
     </div>
     <div>
         {% for anime in anime_series %}
@@ -14,11 +48,65 @@
         {% endfor %}
     </div>
     <script>
+        up_url = "{% static 'img/checkbox_up.png' %}"
+        down_url = "{% static 'img/checkbox_down.png' %}"
+        none_url = "{% static 'img/checkbox_none.png' %}"
+
+        function blank_if_undefined(item) {
+            if (item == undefined){
+                return ""
+            }
+            else{
+                return item
+            }
+        }
+        function arrayRemove(array, item) { 
+            let index = array.indexOf(item);
+            array.splice(index, removeCount=1);
+        }
+        items = {}
         function redirect(){
-            var url = "http://" + window.location.host + "{% url 'streamer:search-anime'  %}";
-            url += "?search=" + document.getElementById("searchField").value;
+            var url = "http://" + window.location.host + "{% url 'streamer:search-anime'  %}"
+            url += "?search=" + document.getElementById("searchField").value
+
+            for (var item in items) {
+                url += "&"+ item + "=" + blank_if_undefined(items[item])
+            }
             window.location.href = url;
         }
+
+        function add_to_list(a){
+            let image = a.firstChild
+            let checkbox = a.lastChild
+            let name = checkbox.id
+            if (!items[name]){
+                items[name] = []
+            }
+            if (!items[name + "_exl"]){
+                items[name + "_exl"] = []
+            }
+            switch(checkbox.name) {
+                case (name + "_null"):
+                    checkbox.name = name + "_include"
+                    items[name].push(checkbox.value)
+                    image.src = up_url
+
+                    break;
+                case (name + "_include"):
+                    arrayRemove(items[name], checkbox.value)
+                    items[name + "_exl"].push(checkbox.value)
+                    checkbox.name = name + "_exclude"
+                    image.src = down_url
+
+                    break;
+                default:
+                    items[name] = arrayRemove(items[name + "_exl"], checkbox.value)
+                    checkbox.name = name + "_null"
+                    image.src = none_url
+
+            }
+        }
+
     </script>
     {% include "pagination.html" with page=anime_series %}
 {% endblock %}
