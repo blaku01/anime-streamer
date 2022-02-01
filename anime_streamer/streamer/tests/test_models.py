@@ -9,7 +9,7 @@ class AnimeSerielTestCase(TestCase):
     def test_str(self):
         self.assertEqual(f"{self.title}", str(self.naruto))
     def test_get_absolute_url(self):
-        self.assertEqual(f'/{self.title.lower()}/', self.naruto.get_absolute_url())
+        self.assertEqual(f'/animes/{self.title}/', self.naruto.get_absolute_url())
 
 class AnimeChapterTestCase(TestCase):
     def setUp(self):
@@ -25,7 +25,7 @@ class AnimeChapterTestCase(TestCase):
     def test_str(self):
         self.assertEqual(f"{self.naruto_ch_1}", f"{self.title} {self.chapter_number} {self.chapter_title}")
     def test_get_absolute_url(self):
-        self.assertEqual(f'/{self.title.lower()}/{self.chapter_number}/', self.naruto_ch_1.get_absolute_url())
+        self.assertEqual(f'/animes/{self.title}/{self.chapter_number}/', self.naruto_ch_1.get_absolute_url())
 
 class VideoTestCase(TestCase):
     def setUp(self):
