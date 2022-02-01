@@ -8,7 +8,11 @@ import datetime
 
 def anime_series(request):
     anime_series = AnimeSerie.objects.all()
-    return render(request, 'home.html', {'anime_series': anime_series})
+    every_genre = AnimeGenreTag.objects.all()
+    every_char_type = ThemeTag.objects.all()
+    every_status = [x[1] for x in AnimeSerie.STATUSES]
+    every_season = [x[1] for x in AnimeSerie.SEASONS]
+    return render(request, 'home.html', {'anime_series': anime_series, 'every_genre': every_genre, 'every_char_type':every_char_type, 'every_status':every_status, 'every_season':every_season})
 
 def anime_detail(request, title):
     anime = get_object_or_404(AnimeSerie, title=title)
@@ -25,12 +29,10 @@ def chapter_detail(request, title, chapter_number):
     return render(request, 'chapter_detail.html', {'anime': anime, 'anime_chapter' : chapter, 'videos':videos})
 
 def video_detail(request, title, chapter_number, service):
-    anime = AnimeSerie.objects.filter(title=title)
+    anime = get_object_or_404(AnimeSerie, title=title)
     chapter = get_object_or_404(AnimeChapter, anime_serie=anime, chapter_number=chapter_number)
-    service = Video.objects.filter(anime_chapter=chapter, service=service)
-    print(chapter)
-
-    return render(request, 'series_template', {'anime': anime, 'anime_chapter' : chapter })
+    video = get_object_or_404(Video, anime_chapter=chapter, service=service)
+    return render(request, 'videos_template.html', {'anime': anime, 'anime_chapter' : chapter, 'video':video})
 
 def search_for_anime(request):
     every_genre = AnimeGenreTag.objects.all()
@@ -49,7 +51,7 @@ def search_for_anime(request):
     year_min, month_min, day_min, year_max, month_max, day_max = [int(x) for x in [year_min, month_min, day_min, year_max, month_max, day_max]]
     anime_series = AnimeSerie.objects.all()
     if search:
-        anime_series = anime_series.filter(title__icontains=search)
+        anime_series = anime_series.filter(title__trigram_similar=search)
     if genres != ['']:
         anime_series = anime_series.filter(anime_genre_tags__name__in=genres).annotate(num_tags=Count('anime_genre_tags')).filter(num_tags__gte=len(genres))
     if char_types != ['']:

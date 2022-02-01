@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 {% load streamer_tags %}
 {% block content %}
-<div id="select_video" name="select_video"><p><a href="../../">back to anime choice</a> | <a href="../">back to chapter choice</a></p>
+<p><a href="../../">back to anime choice</a> | <a href="../">back to chapter choice</a></p>
     <h1>{{anime_chapter.title}}</h1>
     <p><b>description: </b>{{ anime_chapter.description }}</p>
     <p>{{anime_series.title}} chapter {{ anime_chapter.chapter_number}} videos:</p>
-    <table>
-        <tbody>
-            <tr>
-                <th>voice lang</th>
-                <th>sub lang</th>
-                <th>service</th>
-                <th>quality</th>
-                <th>link</th>
-            </tr>
+    <table class="table w-50">
+            <thead>
+                <th scope="col">voice lang</th>
+                <th scope="col">sub lang</th>
+                <th scope="col">service</th>
+                <th scope="col">quality</th>
+                <th scope="col">link</th>
+            </thead>
+            <tbody>
             {% for video in videos %}
                 <tr>
                     <td>{{ video.voice_lang }}</td>
@@ -24,7 +24,7 @@
                 </tr>
             {% endfor %}
         </tbody>
-</table></div>
+</table>
 {% endblock %}
 {% block menu %}
 {% endblock %}

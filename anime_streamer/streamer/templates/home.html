@@ -5,46 +5,59 @@
 
 {% block content %}
     <style>
-        search_form {
-            display: flex;
-            align-content: space-between;
-        }
-        input[type="button"] {
-                border: none;
-                outline:none;
-                }
-        input[type="button"]:hover {
-            box-shadow: 0 0 7px rgba(15, 8, 8, 0.5); 
-        }
-        a{
-            margin: 5px;
-        }
-
+        .img-hover:hover {
+            transform: scale(1.04);
+            cursor: pointer;
+            box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.22);
+            }
     </style>
-    <h1>currently we've added {% total_series %} series!</h1>
+    <h1 class="">currently we've added {% total_series %} series!</h1>
     <div>
-        <form action="{% url 'streamer:search-anime' %}" method="get" class="search_form">
-            <input name="search" type="text" id="searchField" placeholder="Search">
-            <p>anime genres:</p>
-            {% for genre in every_genre %}
-                <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="genre" name="genre_null" value="{{genre.name}}"></a>
-            {% endfor %}
-                <p>character types:</p>
-            {% for char_type in every_char_type %}
-                <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="char_type" name="char_type_null" value="{{char_type.name}}"style="border:none;"></a>
-            {% endfor %}
-            <p><input onclick="redirect()" type="button" value="search!"></p>
-            {% for status in every_status %}
-                <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="status" name="status_null" value="{{status}}"style="border:none;"></a>
-            {% endfor %}
-            {% for season in every_season %}
-            <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="season" name="season_null" value="{{season}}"style="border:none;"></a>
-            {% endfor %}
+        <form action="{% url 'streamer:search-anime' %}" method="get" class="container">
+            <div class="container">
+                <div class="d-flex">
+                    <input name="search" type="text" id="searchField" placeholder="Search" class="form-control w-25">
+                    <input onclick="redirect()" type="button" value="search!" class="btn btn-primary">
+                </div>
+            </div>
+            <div class="container">
+                <p class="lead">anime genres:</p>
+                <div class="d-flex flex-wrap">
+                {% for genre in every_genre %}
+                    <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right" id="genre" name="genre_null" value="{{genre.name}}"></a>
+                {% endfor %}
+                </div>
+            </div>
+            <div class="container">
+                <p class="lead">character types:</p>
+                <div class="d-flex flex-wrap">
+                    {% for char_type in every_char_type %}
+                        <a onclick=add_to_list(this) ><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" id="char_type" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right" name="char_type_null" value="{{char_type.name}}"></a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="container">
+                <p class="lead">statuses:</p>
+                <div class="d-flex flex-wrap">
+                    {% for status in every_status %}
+                    <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right" id="status" name="status_null" value="{{status}}"style="border:none;"></a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="container">
+                <p class="lead">seasons:</p>
+                <div class="d-flex flex-wrap">
+                    {% for season in every_season %}
+                    <a onclick=add_to_list(this)><img src="{% static 'img/checkbox_none.png' %}" width=20px><input type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right" id="season" name="season_null" value="{{season}}"style="border:none;"></a>
+                    {% endfor %}
+                </div>
+            </div>
+
         </form>
     </div>
     <div>
         {% for anime in anime_series %}
-            <a href="{{ anime.get_absolute_url }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
+            <a href="{{ anime.get_absolute_url }}"><img class="rounded img-hover" src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
         {% endfor %}
     </div>
     <script>

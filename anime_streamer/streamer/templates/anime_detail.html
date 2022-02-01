@@ -1,16 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
     <p><a href="../">back to anime choice</a></p>
-    <form method="POST" action="">
-        {% csrf_token %}
-
-        <input type="submit" value="Submit">
-    </form>
-    <table>
+    <table class="table w-50">
         <thead>
-            <td><b>title</b></td>
-            <td><b>type</b></td>
-            <td><b>created at</b></td>
+            <th scope="col">title</th>
+            <th scope="col">type</th>
+            <th scope="col">created at</th>
         </thead>
         <tbody>
             {% for chapter in chapters %}
@@ -27,7 +22,7 @@
         {% for anime in simillar_anime_series %}
             <a href="{{ anime_series.get_absolute_url }}"><img src="{{ anime.thumbnail_image.url }}" alt="{{ anime.title }}" width="200"></a>
         {% empty %}
-            Nie ma podobnych postów.
+            <p>There aren't any simillar animes.</p>
         {% endfor %}
     </div>
 {% endblock %}
